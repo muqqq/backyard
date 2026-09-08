@@ -17,6 +17,7 @@
     --accent: #d9713f; --accent-ink: #1e1c19; --chip: #2f2b26; --sky: #2a2e33; --grid: #4a443c;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { height: 100%; }
   body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 "Work Sans", "Helvetica Neue", Arial, sans-serif; overflow: hidden; }
   #stage { position: fixed; inset: 0; }
@@ -427,11 +428,13 @@ if (SHARE) document.getElementById('editSection').hidden = true;
 (async () => {
   if (SHARE) return;
   try { dbNs = window.claude && claude.use ? await claude.use('db') : null; } catch (e) { dbNs = null; }
-  if (!dbNs) { saveBtn.textContent = 'Copy points below'; return; }
+  if (!dbNs) { saveBtn.textContent = '💾 Save on this device';
+    try { const s = JSON.parse(localStorage.getItem('seatCtrl') || 'null'); if (Array.isArray(s) && s.length === ctrl.length) { ctrl = s.map(p => [...p]); syncHandles(); rebuildWall(); wallMsg.textContent = 'Loaded the shape saved on this device.'; } } catch (e) {}
+    return; }
   try { const snap = await dbNs.doc('design/seatWall').get(); if (snap.exists && Array.isArray(snap.data().pts) && snap.data().pts.length === ctrl.length) { ctrl = snap.data().pts.map(p => [...p]); syncHandles(); rebuildWall(); wallMsg.textContent = 'Loaded the saved shape.'; } } catch (e) {}
 })();
 saveBtn.addEventListener('click', async () => {
-  if (!dbNs) { wallMsg.textContent = 'Saving is not available here. Copy the points from the box.'; return; }
+  if (!dbNs) { try { localStorage.setItem('seatCtrl', JSON.stringify(ctrl)); wallMsg.textContent = 'Saved in this browser only. Copy the points from the box to send them to Claude.'; } catch (e) { wallMsg.textContent = 'Could not save here. Copy the points from the box.'; } return; }
   try { await dbNs.doc('design/seatWall').set({ pts: ctrl.map(p => [+p[0].toFixed(3), +p[1].toFixed(3)]), savedAt: new Date().toISOString() }); wallMsg.textContent = 'Saved. Claude can read this shape into the plan files.'; }
   catch (e) { wallMsg.textContent = 'Save failed (' + (e && e.code || 'error') + '). Copy the points from the box instead.'; }
 });

@@ -21,6 +21,10 @@ The first link is the one to share. It opens in any phone or desktop browser.
 - **Seat wall shape** (editor copies): drag the orange handles in plan view, then Save.
 - Drag to orbit, scroll or pinch to zoom, right-drag to pan. "Hide ✕" collapses the panel.
 
+## Open items
+
+`TODO.md` tracks what still needs measuring, deciding and calling about, most time-critical first.
+
 ## Files
 
 - `plan.py` generates everything: `backyard_plan.svg`, `backyard_plan.dxf`, `backyard_geom.json`, `backyard_3d.html` (editor) and `index.html` (view only) from `viewer_template.html`.
